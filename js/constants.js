@@ -1,6 +1,5 @@
 let server_addr="http://localhost:8081";
 let gift_server_addr="http://localhost:8082";
-// let server_addr="http://10.11.9.25:7090/";
 
 let sendSmsUrl = server_addr + "/user/sendLoginCode";
 let mobileLoginUrl = server_addr + "/user/mobileLogin";
