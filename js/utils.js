@@ -29,7 +29,22 @@ function logout() {
     window.location.href = '../common/admin_login.html';
 }
 
+const axiosReq = axios.create({
+    timeout: 5000, // 请求超时时间
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+})
 
+function httpPost(url, params) {
+    let result = axiosReq.post(url,params).then(function(response){
+        return response.data;
+    },function(error) {
+        consolog.error(error);
+        return "sys-error";
+    })
+    return result;
+}
 
 
 

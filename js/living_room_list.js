@@ -17,9 +17,20 @@ new Vue({
 
 	//页面初始化的时候会调用下这里面的方法
 	mounted() {
+		this.initPage();
 	},
 
 	methods: {
+		initPage:function() {
+			let data = new FormData();
+			data.append("id",1);
+			httpPost('http://localhost:8080/live/api/test/testPost',data).then(resp=>{
+				console.log(resp);
+			})
+			httpPost('http://localhost:8080/live/api/test/testPost2',data).then(resp=>{
+				console.log(resp);
+			})
+		},
 		showLoginPopNow: function () {
 			this.showLoginPop = true;
 		},
@@ -57,6 +68,7 @@ new Vue({
 					that.lastTime = 60;
 					that.loginCodeBtn = '验证码';
 					that.hasSendSms = false;
+					console.log('清理定时器');
 					clearInterval(interval);
 					return;
 				} else {
