@@ -17,20 +17,9 @@ new Vue({
 
 	//页面初始化的时候会调用下这里面的方法
 	mounted() {
-		this.initPage();
 	},
 
 	methods: {
-		initPage:function() {
-			let data = new FormData();
-			data.append("id",1);
-			httpPost('http://localhost:8080/live/api/test/testPost',data).then(resp=>{
-				console.log(resp);
-			})
-			httpPost('http://localhost:8080/live/api/test/testPost2',data).then(resp=>{
-				console.log(resp);
-			})
-		},
 		showLoginPopNow: function () {
 			this.showLoginPop = true;
 		},
@@ -61,16 +50,13 @@ new Vue({
 			}
 			this.hasSendSms = true;
 			//发送验证码按钮文字调整
-			console.log('send sms');
 			var that = this;
 			var interval = setInterval(function () {
-				console.log('send sms test');
 				that.loginCodeBtn = '发送中(' + that.lastTime + ')';
 				if (that.lastTime == 0) {
 					that.lastTime = 60;
 					that.loginCodeBtn = '验证码';
 					that.hasSendSms = false;
-					console.log('清理定时器');
 					clearInterval(interval);
 					return;
 				} else {
