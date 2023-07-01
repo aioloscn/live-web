@@ -4,7 +4,7 @@ function addCookie(name, value, days, path) {
     var value = escape(value);
     var expires = new Date();
     expires.setTime(expires.getTime() + days * 3600000 * 24);
-    //path=/，表示cookie能在整个网站下使用，path=/temp，表示cookie只能在temp目录下使用
+    //path=/，表示cookie能在整个网站下使用
     path = path == "" ? "" : ";path=" + path;
     //GMT(Greenwich Mean Time)是格林尼治平时，现在的标准时间，协调世界时是UTC
     //参数days只能是数字型
@@ -31,16 +31,18 @@ function logout() {
 
 const axiosReq = axios.create({
     timeout: 5000, // 请求超时时间
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 })
 
 function httpPost(url, params) {
+    var that = this;
     let result = axiosReq.post(url,params).then(function(response){
         return response.data;
     },function(error) {
-        consolog.error(error);
+        console.error(error);
         return "sys-error";
     })
     return result;
