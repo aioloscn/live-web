@@ -38,12 +38,14 @@ const axiosReq = axios.create({
 })
 
 function httpPost(url, params) {
-    var that = this;
     let result = axiosReq.post(url,params).then(function(response){
         return response.data;
     },function(error) {
-        console.error(error);
-        return "sys-error";
+        //定义一个统一的错误对象返回
+        var errorObj = new Object();
+        errorObj.code=500;
+        errorObj.msg = '亲，系统出小差了';
+        return errorObj;
     })
     return result;
 }
