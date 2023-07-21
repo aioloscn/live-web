@@ -10,7 +10,9 @@ new Vue({
 		hasSendSms: false,
 		livingRoomList: {},
 		isLogin: false,
-		initInfo: "登录",
+		initInfo: {},
+		loginBtnMsg: '登录',
+		showStartLivingBtn:false,
 		listType: 0,
 		startLivingRoomTab: false
 	},
@@ -22,8 +24,15 @@ new Vue({
 
 	methods: {
 		initPage:function() {
+			var that = this;
 			httpPost(homePageUrl,{}).then(resp=>{
-				console.log('请求成功');
+				//登录成功
+				console.log(resp.data);
+				if(resp.data.loginStatus==true) {
+					that.initInfo=resp.data;
+					that.loginBtnMsg='';
+					that.isLogin =true;
+				}
 			})
 		},
 		showLoginPopNow: function () {
@@ -55,12 +64,24 @@ new Vue({
 					that.hiddenLoginPopNow();
 					that.isLogin=true;
 					that.userId=resp.data.userId;
+					that.initPage();
 				} else {
 					that.$message.error(resp.msg);
 				}
 			})
 		},
 
+		showStartLivingRoomTab: function() {
+            this.startLivingRoomTab = true;
+        },
+		startLivingRoom: function () {
+			this.toLivingRoom();
+        },
+
+		jumpToLivingRoomPage() {
+            //去直播间详情页面
+            window.location.href = "./living_room.html";
+        },
 
 		sendSmsCode: function () {
 			if (this.hasSendSms) {
