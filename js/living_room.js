@@ -31,7 +31,7 @@ new Vue({
     },
 
     mounted() {
-        this.initUserInfo();
+        this.anchorConfigUrl();
     },
 
     beforeDestroy() {
@@ -40,16 +40,32 @@ new Vue({
 
     methods: {
 
-        initUserInfo: function () {
-            httpPost(initInfoUrl, {})
+        anchorConfigUrl: function () {
+            let data = new FormData();
+			data.append("roomId",getQueryStr("roomId"));
+            var that = this;
+            httpPost(anchorConfigUrl, data)
                 .then(resp => {
                     if (isSuccess(resp)) {
-                        this.initInfo = resp.data;
-                        console.log(this.initInfo);
+                        if(resp.data.roomId>0) {
+                            that.initInfo = resp.data;
+                        } else {
+                            this.$message.error('直播间已不存在');
+                        }
                     }
                 });
         },
         
+        closeLivingRoom: function() {
+            let data = new FormData();
+			data.append("roomId",getQueryStr("roomId"));
+            httpPost(closeLiving, data)
+            .then(resp => {
+                if (isSuccess(resp)) {
+                    window.location.href='./living_room_list.html';
+                }
+            });
+        },
 
         sendReview: function () {
             if (this.form.review == '') {

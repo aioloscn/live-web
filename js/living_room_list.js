@@ -13,16 +13,25 @@ new Vue({
 		initInfo: {},
 		loginBtnMsg: '登录',
 		showStartLivingBtn:false,
-		listType: 0,
-		startLivingRoomTab: false
+		listType: 1,
+		page:1,
+		pageSize:15,
+		startLivingRoomTab: false,
+		loadingNextPage: false,
+		hasNextPage: true
 	},
 
 	//页面初始化的时候会调用下这里面的方法
 	mounted() {
 		this.initPage();
+		this.listLivingRoom();
+		this.initLoad();
 	},
 
 	methods: {
+		load:function() {
+			console.log('this is load');
+		},
 		initPage:function() {
 			var that = this;
 			httpPost(homePageUrl,{}).then(resp=>{
@@ -32,6 +41,19 @@ new Vue({
 					that.initInfo=resp.data;
 					that.loginBtnMsg='';
 					that.isLogin =true;
+				}
+			})
+		},
+		listLivingRoom: function() {
+			var that = this;
+			let data = new FormData();
+			data.append("page",this.page);
+			data.append("pageSize",this.pageSize);
+			data.append("type",this.listType);
+			httpPost(listLivingRoomUrl,data).then(resp=>{
+				//登录成功
+				if(isSuccess(resp)) {
+					that.livingRoomList = resp.data.list;
 				}
 			})
 		},
@@ -78,10 +100,24 @@ new Vue({
 			this.toLivingRoom();
         },
 
-		jumpToLivingRoomPage() {
-            //去直播间详情页面
-            window.location.href = "./living_room.html";
+		jumpToLivingRoomPage(livingType) {
+			let data = new FormData();
+			data.append("type",livingType);
+			//请求开播接口
+			httpPost(startLiving,data).then(resp=>{
+				//开播成功
+				if(isSuccess(resp)) {
+				    //去直播间详情页面
+					window.location.href = "./living_room.html?roomId=" + resp.data.roomId;
+				} else {
+					that.$message.error(resp.msg);
+				}
+			})
+
         },
+		jumpToLivingRoom(roomId) {
+			window.location.href = "./living_room.html?roomId=" + roomId;
+		},
 
 		sendSmsCode: function () {
 			if (this.hasSendSms) {
@@ -130,6 +166,39 @@ new Vue({
 			return true;
 		},
 
+		initLoad: function() {
+			   	let that = this;
+				window.addEventListener('scroll', function() {
+					let scrollTop=document.documentElement.scrollTop//滚动条在Y轴滚动过的高度
+					let scrollHeight=document.documentElement.scrollHeight//滚动条的高度
+					let clientHeight=document.documentElement.clientHeight//浏览器的可视高度
+					//可能会有部分误差
+					if(scrollTop+clientHeight>=scrollHeight-100 && that.loadingNextPage==false && that.hasNextPage == true){
+					  that.loadingNextPage = true;
+					  console.log('滚动到底部了');
+					  //触发第二页的数据加载
+					  that.page = that.page + 1;
+					  let data = new FormData();
+					  data.append("page",that.page);
+					  data.append("pageSize",that.pageSize);
+					  data.append("type",that.listType);
+					  httpPost(listLivingRoomUrl,data).then(resp=>{
+							//登录成功
+							if(isSuccess(resp)) {
+								let livingRoomTempList = resp.data.list;
+								for (i = 0; i < livingRoomTempList.length; i++) {
+									that.livingRoomList.push(livingRoomTempList[i]);
+								}
+								if(!resp.data.hasNext) {
+									that.hasNextPage = false;
+								} 
+								that.loadingNextPage = false;
+
+							}
+						})
+					}
+				});
+		}
 	}
 
 })
