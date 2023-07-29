@@ -34,9 +34,6 @@ new Vue({
 		},
 		initPage:function() {
 			var that = this;
-			if(!this.isLogin) {
-				return;
-			}
 			httpPost(homePageUrl,{}).then(resp=>{
 				//登录成功
 				console.log(resp.data);
