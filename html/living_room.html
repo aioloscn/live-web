@@ -116,7 +116,7 @@
             <div style="height: 60px;">
                 <span><img src="../img/livingroom.jpg" alt="" style="width: 40px;height: 40px;position:relative; top: 15px;left: 10%;">
                 <span style="position: relative;left: 12%;top:5px;">在线充值</span>
-                <span style="position: relative;left: 50%;top:5px;">当前余额：<span style="color: #f37d08;"><b>{{accountInfo.currentBalance}}</b></span></span>
+                <span style="position: relative;left: 50%;top:5px;">当前余额：<span style="color: #f37d08;"><b>{{currentBalance}}</b></span></span>
                 </span>
             </div>
             <div style="text-align: center;">
@@ -129,7 +129,7 @@
             <div style="height: 50px;" v-show="qrCode==''"></div>
             <div style="height: 250px;" v-show="qrCode!=''">
                 <div style="text-align: center;">
-                    <img :src="qrCode" style="height: 180px;width: 180px;" alt="">
+                    <img src="../img/qr-code.png" style="height: 180px;width: 180px;" alt="">
                     <div style="font-size: 13px;color: #a4a4a4">
                         请使用 <img style="display: inline-block;width: 13px;height: 13px;position:relative;top: 1px;" src="../img/zfb.jpg"> 支付宝/
                         <img style="display: inline-block;width: 13px;height: 13px;position:relative;top: 1px;" src="../img/wx.jpg"> 微信 扫码支付 

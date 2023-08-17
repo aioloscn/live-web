@@ -23,7 +23,8 @@ new Vue({
         lastPayBtnId: -1,
         payProducts: [],
         nickname:'',
-        qrCode: '',
+        currentBalance:0,
+        qrCode: 'true',
         dlProgress: 10,
         closeLivingRoomDialog: false,
         livingRoomHasCloseDialog: false,
@@ -35,6 +36,7 @@ new Vue({
         this.anchorConfigUrl();
         this.initSvga();
         this.initGiftConfig();
+        this.listPayProduct();
     },
 
     beforeDestroy() {
@@ -60,6 +62,20 @@ new Vue({
             parser = new window.SVGA.Parser(canvas);
          
         },
+
+        listPayProduct: function() {
+            let data = new FormData();
+            data.append("type",0);
+            let that = this;
+            httpPost(payProductsUrl, data)
+            .then(resp => {
+                if (isSuccess(resp)) {
+                    that.payProducts = resp.data.payProductItemVOList;
+                    that.currentBalance = resp.data.currentBalance;
+                }
+            });  
+        },
+
         sendGift: function(giftId) {
             let data = new FormData();
 			data.append("giftId",giftId);
@@ -89,6 +105,14 @@ new Vue({
             });
         },
 
+        showBankInfoTab:function() {
+          this.showBankInfo=true;
+        },
+
+        hiddenBankInfoTabNow:function() {
+            this.showBankInfo = false;
+        },
+        
         //直播间初始化配置加载时候调用
         anchorConfigUrl: function () {
             let data = new FormData();
