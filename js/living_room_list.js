@@ -26,6 +26,7 @@ new Vue({
 		this.initPage();
 		this.listLivingRoom();
 		this.initLoad();
+		console.log('handler');
 	},
 
 	methods: {
@@ -36,7 +37,6 @@ new Vue({
 			var that = this;
 			httpPost(homePageUrl,{}).then(resp=>{
 				//登录成功
-				console.log(resp.data);
 				if(resp.data.loginStatus==true) {
 					that.initInfo=resp.data;
 					that.loginBtnMsg='';
@@ -51,6 +51,7 @@ new Vue({
 			data.append("pageSize",this.pageSize);
 			data.append("type",this.listType);
 			httpPost(listLivingRoomUrl,data).then(resp=>{
+				console.log('直播间列表');
 				//登录成功
 				if(isSuccess(resp)) {
 					that.livingRoomList = resp.data.list;
@@ -108,7 +109,7 @@ new Vue({
 			}
 			let data = new FormData();
 			data.append("type",livingType);
-			请求开播接口
+			//请求开播接口
 			httpPost(startLiving,data).then(resp=>{
 				//开播成功
 				if(isSuccess(resp)) {

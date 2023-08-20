@@ -104,6 +104,20 @@ new Vue({
                 });
             });
         },
+        //选择对应的支付产品，并且充值
+        payProduct: function(productId) {
+            let data = new FormData();
+			data.append("productId",productId);
+            data.append("payChannel",1);
+            data.append("paySource",1);
+            let that = this;
+            httpPost(payProductUrl, data)
+            .then(resp => {
+                if (!isSuccess(resp)) {
+                    that.$message.error('充值异常');
+                }
+            });  
+        },
 
         showBankInfoTab:function() {
           this.showBankInfo=true;

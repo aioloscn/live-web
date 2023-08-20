@@ -101,7 +101,7 @@
                     <span @click="showBankInfoTab()">
                         钱包余额:
                     </span>
-                    <span style="color: white">{{accountInfo.currentBalance}}</span>
+                    <span style="color: white">{{currentBalance}}</span>
                 </div>
                 <div class="gift_item" v-for="item in giftList">
                     <img @click="sendGift(item.giftId)" :src="item.coverImgUrl" class="gift_img" alt="">
@@ -121,7 +121,7 @@
             </div>
             <div style="text-align: center;">
                 <span v-for="item in payProducts">
-                    <button class="recharge_btn" :id="item.id" @click="chooseCoin(item.id)">{{item.name}}<br>
+                    <button class="recharge_btn" :id="item.id" @click="payProduct(item.id)">{{item.name}}<br>
                         <span class="coin_um">{{item.coinNum}}旗鱼币</span>
                     </button>
                 </span>

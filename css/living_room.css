@@ -255,10 +255,10 @@
 
 .recharge_tab {
     position: fixed;
-    left: 35%;
-    top: 30%;
+    left: 30%;
+    top: 10%;
     z-index: 1000;
-    width: 30%;
+    width: 40%;
     background-color: white;
     border-radius: 5px;
 }
