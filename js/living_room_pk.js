@@ -237,6 +237,11 @@ new Vue({
                     //送礼失败
                     let respMsg = JSON.parse(respData.data);
                     this.$message.error(respMsg.msg);
+                } else if(respData.bizCode == 5558){
+                    this.$message.success("pk礼物送礼成功");
+                }else if(respData.bizCode == 5559){
+                    //送礼失败
+                    this.$message.success("pk用户已上线");
                 }
                 this.sendAckCode(respData);
             }
