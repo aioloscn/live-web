@@ -31,12 +31,15 @@ new Vue({
         timer: null,
         pkUserId:0,
         pkObjId:0,
-        lastChooseAnchorTab: ''
+        lastChooseAnchorTab: '',
+        anchorImg:'',
+        pkObjImg:'',
+        pkObjId:0
     },
 
     mounted() {
         this.roomId = getQueryStr("roomId");
-        this.anchorConfigUrl();
+        this.anchorConfig();
         this.initSvga();
         this.initGiftConfig();
         this.listPayProduct();
@@ -82,6 +85,7 @@ new Vue({
         sendGift: function(giftId) {
             let data = new FormData();
 			data.append("giftId",giftId);
+            data.append("type",1);
             data.append("roomId",getQueryStr("roomId"));
             data.append("receiverId",this.initInfo.anchorId);
             let that = this;
@@ -118,6 +122,9 @@ new Vue({
             .then(resp => {
                 if (!isSuccess(resp)) {
                     that.$message.error('充值异常');
+                } else {
+                    that.$message.success('充值成功');
+                    that.listPayProduct();    
                 }
             });  
         },
@@ -125,6 +132,8 @@ new Vue({
         connectLiving: function() {
           console.log('连线');
           let that = this;
+          let data = new FormData();
+          data.append("roomId",getQueryStr("roomId"));
           httpPost(onlinePkUrl, data)
           .then(resp => {
               if (isSuccess(resp)) {
@@ -164,7 +173,7 @@ new Vue({
         },
         
         //直播间初始化配置加载时候调用
-        anchorConfigUrl: function () {
+        anchorConfig: function () {
             let data = new FormData();
 			data.append("roomId",getQueryStr("roomId"));
             var that = this;
@@ -173,6 +182,7 @@ new Vue({
                     if (isSuccess(resp)) {
                         if(resp.data.roomId>0) {
                             that.initInfo = resp.data;
+                            that.anchorImg = that.initInfo.avatar;
                             that.connectImServer();
                         } else {
                             this.$message.error('直播间已不存在');
@@ -214,6 +224,7 @@ new Vue({
 
         websocketOnMessage: function(e) { //数据接收
             let wsData = JSON.parse(e.data);
+            console.log(wsData);
             if(wsData.code == 1001) {
                 this.startHeartBeatJob();
             } else if (wsData.code == 1003) {
@@ -230,20 +241,19 @@ new Vue({
                         var div = document.getElementById('talk-content-box')
                         div.scrollTop = div.scrollHeight
                     })
-                    //发送ack确认消息
-                } else if(respData.bizCode == 5556) {
-                    //送礼成功
-                    let respMsg = JSON.parse(respData.data);
-                    this.playGiftSvga(respMsg.url);
                 } else if(respData.bizCode == 5557){
                     //送礼失败
                     let respMsg = JSON.parse(respData.data);
                     this.$message.error(respMsg.msg);
                 } else if(respData.bizCode == 5558){
-                    this.$message.success("pk礼物送礼成功");
+                    let respMsg = JSON.parse(respData.data);
+                    console.log(respMsg);
+                    this.playGiftSvga(respMsg.url);
                 }else if(respData.bizCode == 5559){
-                    //送礼失败
                     this.$message.success("pk用户已上线");
+                    let respMsg = JSON.parse(respData.data);
+                    this.pkObjId = respMsg.pkObjId;
+                    this.pkObjImg = respMsg.pkObjAvatar;
                 }
                 this.sendAckCode(respData);
             }
