@@ -34,7 +34,13 @@
 }
 
 .top-title-link:hover {
-    color: #201f24;
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: orange;
+    color: white;
+}
+
+.top-title-active {
     cursor: pointer;
     padding: 10px 20px;
     background-color: orange;

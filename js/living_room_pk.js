@@ -177,6 +177,8 @@ new Vue({
                         } else {
                             this.$message.error('直播间已不存在');
                         }
+                    } else {
+                        this.$message.error(resp.msg);
                     }
                 });
         },
