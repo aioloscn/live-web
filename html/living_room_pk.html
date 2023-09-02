@@ -59,6 +59,7 @@
                   </span>
                 </el-dialog>
                 <span>
+                    <span class="living-room-top-tab-name">{{initInfo.watcherNickName}}</span>
                     <img :src="initInfo.watcherAvatar" style="height: 30px;width: 30px;border-radius: 50%;" alt="">
                 </span>
                 <span style="position:relative;top: -12px;">
@@ -74,7 +75,7 @@
             <div class="liveroom_top">
                 <div style="position: relative;top: -30px;">
                     <div class="anchor_name">
-                        <div style="display: inline-block;">{{initInfo.nickName}}</div>
+                        <div style="display: inline-block;">{{initInfo.anchorNickName}}</div>
                         <img src="../img/living.jpg" class="anchor_label" alt="">
                     </div>
                     <img :src="initInfo.avatar" class="anchor_img" alt="">
