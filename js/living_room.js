@@ -26,6 +26,9 @@ new Vue({
         currentBalance:0,
         qrCode: 'true',
         dlProgress: 10,
+        redPacketConfigCode: '',
+        showPrepareBtn:false,
+        showStartBtn: false,
         closeLivingRoomDialog: false,
         livingRoomHasCloseDialog: false,
         timer: null
@@ -86,7 +89,7 @@ new Vue({
             httpPost(sendGiftUrl, data)
             .then(resp => {
                 if (!isSuccess(resp)) {
-                    that.$message.error('送礼异常');
+                    that.$message.error(resp.msg);
                 }
             });  
         },
@@ -142,11 +145,34 @@ new Vue({
                         if(resp.data.roomId>0) {
                             that.initInfo = resp.data;
                             that.connectImServer();
+                            that.redPacketConfigCode = resp.data.redPacketConfigCode;
+                            that.showPrepareBtn = (that.redPacketConfigCode!='');
                         } else {
                             this.$message.error('直播间已不存在');
                         }
                     }
                 });
+        },
+
+        prepareRedPacket: function() {
+            let data = new FormData();
+			data.append("roomId",getQueryStr("roomId"));
+            httpPost(prepareRedPacketUrl, data)
+                .then(resp => {
+                    if (isSuccess(resp)) {
+                       if(!resp.data) {
+                         this.$message.error('没有红包雨配置权限');
+                       } else {
+                         this.showStartBtn = true;
+                         this.showPrepareBtn = false;
+                         this.$message.success('红包数据初始化完成');
+                       }
+                    }
+                });
+        },
+
+        startSendRedPacket: function() {
+
         },
         
 
