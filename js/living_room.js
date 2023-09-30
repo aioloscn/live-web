@@ -179,7 +179,7 @@ new Vue({
                     .then(resp => {
                         if (isSuccess(resp)) {
                             if(!resp.data) {
-                                this.$message.error(resp.msg);
+                                this.$message.error('红包广播失败');
                             } else {
                                 this.showStartBtn = false;
                                 this.$message.success('已发送广播通知');
@@ -249,8 +249,10 @@ new Vue({
                         this.startingRedPacket=true;
                         //开始红包雨活动
                         let respMsg = JSON.parse(respData.data);
-                        console.log(respMsg);
-                        initRedPacket(respMsg.totalGet,this.redPacketConfigCode);
+                        let redPacketConfig = JSON.parse(respMsg.redPacketConfig);
+                        console.log(redPacketConfig.totalCount);
+                        console.log(redPacketConfig.configCode);
+                        initRedPacket(redPacketConfig.totalCount,redPacketConfig.configCode);
                     }
                    
                 }

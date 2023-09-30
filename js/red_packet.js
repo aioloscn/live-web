@@ -2,6 +2,8 @@ function initRedPacket(num,redPacketConfigCode) {
     var dom = createDom(num);
     var wrapper = document.getElementById('wrapper');
     wrapper.appendChild(dom);
+    console.log(num);
+    console.log(redPacketConfigCode);
     bindEvent(redPacketConfigCode);
 }
 
