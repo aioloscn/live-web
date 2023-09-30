@@ -31,7 +31,8 @@ new Vue({
         showStartBtn: false,
         closeLivingRoomDialog: false,
         livingRoomHasCloseDialog: false,
-        timer: null
+        timer: null,
+        startingRedPacket:false
     },
 
     mounted() {
@@ -146,7 +147,7 @@ new Vue({
                             that.initInfo = resp.data;
                             that.connectImServer();
                             that.redPacketConfigCode = resp.data.redPacketConfigCode;
-                            that.showPrepareBtn = (that.redPacketConfigCode!='');
+                            that.showPrepareBtn = (that.redPacketConfigCode!=null);
                         } else {
                             this.$message.error('直播间已不存在');
                         }
@@ -161,7 +162,7 @@ new Vue({
                 .then(resp => {
                     if (isSuccess(resp)) {
                        if(!resp.data) {
-                         this.$message.error('没有红包雨配置权限');
+                         this.$message.error(resp.msg);
                        } else {
                          this.showStartBtn = true;
                          this.showPrepareBtn = false;
@@ -172,7 +173,19 @@ new Vue({
         },
 
         startSendRedPacket: function() {
-
+                let data = new FormData();
+                data.append("redPacketConfigCode",this.redPacketConfigCode);
+                httpPost(startRedPacketUrl, data)
+                    .then(resp => {
+                        if (isSuccess(resp)) {
+                            if(!resp.data) {
+                                this.$message.error(resp.msg);
+                            } else {
+                                this.showStartBtn = false;
+                                this.$message.success('已发送广播通知');
+                            }
+                        }
+                    });
         },
         
 
@@ -231,6 +244,15 @@ new Vue({
                     //送礼失败
                     let respMsg = JSON.parse(respData.data);
                     this.$message.error(respMsg.msg);
+                } else if (respData.bizCode == 5560) {
+                    if(!this.startingRedPacket) {
+                        this.startingRedPacket=true;
+                        //开始红包雨活动
+                        let respMsg = JSON.parse(respData.data);
+                        console.log(respMsg);
+                        initRedPacket(respMsg.totalGet,this.redPacketConfigCode);
+                    }
+                   
                 }
                 this.sendAckCode(respData);
             }

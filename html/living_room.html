@@ -6,16 +6,34 @@
     <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="../css/living_room.css">
+    <link rel="stylesheet" href="../css/red_packet.css">
     <!-- 引入ElementUI组件库 -->
     <script src="../js/vue.js"></script>
     <script src="../js/index.js"></script>
-</head>
+    <script src="../js/red_packet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.0.7/build/svga.min.js"></script>
 <!--<script src="https://cdn.jsdelivr.net/npm/svga.lite/svga.lite.min.js"></script>-->
-<script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.0.7/build/svga.min.js"></script>
+</head>
+<style>
+    body{
+        overflow: hidden;
+    }
+</style>
+
 <body class="main-content">
 
 <div id="app">
-
+    <div class="red-packet-wrap">
+        <div id="wrapper" >
+            <img  src="../img/petal.jpg" style="width: 140px;">
+        </div>
+        <div id="modol">
+            <div id="hb">
+                <div id="text"></div>
+                <div id="btn">继续抢红包</div>
+            </div>
+        </div>
+    </div>
     <div class="top-tab">
         <div>
             <span>
@@ -158,7 +176,7 @@
                     </el-form-item>
                     <el-form-item style="text-align:right;">
                         <el-button type="danger" v-if="showPrepareBtn" @click="prepareRedPacket">初始化红包雨</el-button>
-                        <el-button type="danger" v-if="showStartBtn" @click="startSendRedPacket">开始派发红包雨</el-button>
+                        <el-button type="success" v-if="showStartBtn" @click="startSendRedPacket">开始派发红包雨</el-button>
                         <el-button type="primary" @click="sendReview">发送消息</el-button>
                     </el-form-item>
                 </el-form>

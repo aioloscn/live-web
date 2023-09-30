@@ -15,3 +15,5 @@ let payProductsUrl = server_addr + apiUrl + "/bank/products";
 let payProductUrl = server_addr + apiUrl + "/bank/payProduct";
 let onlinePkUrl = server_addr + apiUrl + "/living/onlinePk";
 let prepareRedPacketUrl = server_addr + apiUrl + "/living/prepareRedPacket";
+let startRedPacketUrl = server_addr + apiUrl + "/living/startRedPacket";
+let getRedPacketUrl = server_addr + apiUrl + "/living/getRedPacket";
