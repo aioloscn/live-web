@@ -29,10 +29,15 @@ new Vue({
         redPacketConfigCode: '',
         showPrepareBtn:false,
         showStartBtn: false,
+        showShopTab: false,
+        showCarTab:false,
         closeLivingRoomDialog: false,
         livingRoomHasCloseDialog: false,
         timer: null,
-        startingRedPacket:false
+        startingRedPacket:false,
+        shopInfoList:[],
+        shopDetailInfo:{},
+        shopCarInfo:[]
     },
 
     mounted() {
@@ -41,6 +46,7 @@ new Vue({
         this.initSvga();
         this.initGiftConfig();
         this.listPayProduct();
+        this.queryShopInfo();
     },
 
     beforeDestroy() {
@@ -49,15 +55,88 @@ new Vue({
 
     methods: {
 
+        queryShopInfo: function() {
+            let data = new FormData();
+            data.append("roomId",getQueryStr("roomId"));
+            var that = this;
+            httpPost(queryShopInfoUrl,data).then(
+                resp=>{
+                    if(isSuccess(resp)) {
+                        that.shopInfoList = resp.data;
+                    }
+                }
+            )
+        },
+
+        queryShopDetailInfo:function(skuId) {
+            let data = new FormData();
+            data.append("skuId",skuId);
+            var that = this;
+            httpPost(queryShopDetailInfoUrl,data).then(
+                resp=>{
+                    if(isSuccess(resp)) {
+                        that.shopDetailInfo = resp.data;
+                    }
+                }
+            )
+        },
+
+        addShopCar:function(skuId) {
+            let data = new FormData();
+            data.append("skuId",skuId);
+            data.append("roomId",getQueryStr("roomId"));
+            var that = this;
+            httpPost(addShopCarUrl,data).then(
+                resp=>{
+                    if(isSuccess(resp)) {
+                        that.$message.success('已加入购物车');
+                        that.hiddenCarTab();
+                    }
+                }
+            )
+        },
+
         initGiftConfig:function() {
             let that = this;
             httpPost(listGiftConfigUrl, {})
             .then(resp => {
                 if (isSuccess(resp)) {
                     that.giftList = resp.data;
-                    console.log(resp.data);
                 }
             });
+        },
+
+        getCarInfo:function() {
+            let data = new FormData();
+            data.append("roomId",getQueryStr("roomId"));
+            var that = this;
+            httpPost(getCarInfoUrl,data).then(
+                resp=>{
+                    if(isSuccess(resp)) {
+                        console.log(resp.data);
+                        that.shopCarInfo=resp.data.shopCarItemRespDTOS;
+                    }
+                }
+            )
+        },
+
+        toShowShopTab: function(skuId) {
+            this.showShopTab = true;
+            this.queryShopDetailInfo(skuId);
+        },
+
+        toShowCarTab: function() {
+            this.showCarTab = true;
+            this.getCarInfo();    
+        },
+
+        hiddenCarTab: function(){
+            this.showCarTab = false;
+        },
+
+        hiddenGreyTab: function() {
+            this.showShopTab = false;
+            this.showCarTab = false
         },
 
         initSvga: function () {

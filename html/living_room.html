@@ -86,10 +86,45 @@
 
         </div>
     </div>
-    <el-row :gutter="20" style="margin-top: 200px;">
+    <div class="grey_bg" v-show="showShopTab==true || showCarTab==true" @click="hiddenGreyTab()">
+    </div>
+    <el-row :gutter="20" style="margin-top: 100px;">
         <el-col :span="4">&nbsp;
         </el-col>
         <el-col :span="11">
+            <div class="shop_info">
+                <div class="shop_img_head">
+                    <b>秒杀商品</b>
+                </div>
+                <div v-for="item in shopInfoList">
+                      <img :src="item.iconUrl" class="shop_img" alt="蓝牙耳机" @click="toShowShopTab(item.skuId)">
+                </div>
+            </div>
+
+            <div class="shop_tab" v-show="showShopTab==true" id="shop_tab">
+                <div style="text-align: center;">
+                    <img :src="shopDetailInfo.originalIconUrl" class="shop_detail_img">
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: orange;"><b>{{shopDetailInfo.name}}</b></div>
+                    <div style="color: grey;">{{shopDetailInfo.remark}}</div>
+                    <div><span style="color: red;"><b>{{shopDetailInfo.skuPrice}}元</b></span></div>
+                    <div style="margin-top: 20px;">
+                        <el-button type="success" @click="addShopCar(shopDetailInfo.skuId)">加入购物车</el-button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="car_tab" id="car_detail" v-show="showCarTab==true" >
+                <div class="car_item" v-for="item in shopCarInfo">
+                    <img :src="item.skuInfoDTO.iconUrl" class="car_item_img" alt="">
+                    <span class="car_item_desc">{{item.skuInfoDTO.name}} 数量：{{item.count}}</span>
+                </div>
+                <div style="text-align: center;margin-top: 20px;">   
+                    <el-button type="success">下单支付</el-button>
+                </div>
+            </div>
+   
             <div class="liveroom_top">
                 <div style="position: relative;top: -30px;">
                     <div class="anchor_name">
@@ -112,6 +147,10 @@
                         <el-button 
                         type="danger" class="prepare_red_packet" @click="prepareRedPacket">红包雨预热</el-button>
                     </span> -->
+
+                    <span style="position: relative;left: -50px;" @click ="toShowCarTab()">  
+                        查看购物车
+                    </span>
                     <span @click="showBankInfoTab()">
                         钱包余额:
                     </span>
