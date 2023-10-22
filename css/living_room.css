@@ -9,6 +9,18 @@
     margin-top: 240px;
 }
 
+.clear-shop-info-btn {
+    position: relative;
+    top: -20px;
+    left: 130px;
+}
+
+.pre_order_total_price{
+    text-align: center;
+    color: orange;
+    margin-top: 20px;
+}
+
 .talk-content-box {
     background-color: white;
     overflow-y: scroll;

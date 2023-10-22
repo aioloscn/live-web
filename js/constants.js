@@ -21,3 +21,5 @@ let queryShopInfoUrl = server_addr + apiUrl + "/shop/listSkuInfo";
 let queryShopDetailInfoUrl = server_addr + apiUrl + "/shop/detail";
 let addShopCarUrl = server_addr + apiUrl + "/shop/addCar";
 let getCarInfoUrl = server_addr + apiUrl + "/shop/getCarInfo";
+let removeFromCarUrl = server_addr + apiUrl + "/shop/removeFromCar"
+let createPrepareOrderInfoUrl = server_addr + apiUrl + "/shop/prepareOrder";

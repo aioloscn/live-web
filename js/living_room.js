@@ -37,7 +37,9 @@ new Vue({
         startingRedPacket:false,
         shopInfoList:[],
         shopDetailInfo:{},
-        shopCarInfo:[]
+        shopCarInfo:[],
+        showOrderTab: false,
+        address:''
     },
 
     mounted() {
@@ -55,6 +57,42 @@ new Vue({
 
     methods: {
 
+        turnBackShopCar:function() {
+                this.showOrderTab=false;
+        },
+
+
+        prepareOrder: function() {
+            if(this.address=='') {
+                this.$message.error('请在填写收货地址后，再下单');
+                return;
+            }
+            console.log(this.shopCarInfo);
+            if(this.shopCarInfo.length<1) {
+                this.$message.error('请先将商品加入购物车后再下单');
+                return;
+            }
+            this.showOrderTab=true;
+            this.$message.success('已生成订单，待确认');
+            this.createPrepareOrderInfo();
+        },
+
+        payNow:function(orderId) {
+                
+        },
+        createPrepareOrderInfo:function() {
+            let data = new FormData();
+            data.append("roomId",getQueryStr("roomId"));
+            var that = this;
+            httpPost(createPrepareOrderInfoUrl,data).then(
+                resp=>{
+                    if(isSuccess(resp)) {
+                        console.log(resp);
+                    }
+                }
+            )
+        },
+
         queryShopInfo: function() {
             let data = new FormData();
             data.append("roomId",getQueryStr("roomId"));
@@ -63,6 +101,21 @@ new Vue({
                 resp=>{
                     if(isSuccess(resp)) {
                         that.shopInfoList = resp.data;
+                    }
+                }
+            )
+        },
+
+        removeShopCarItem: function(skuId) {
+            let data = new FormData();
+            data.append("roomId",getQueryStr("roomId"));
+            data.append("skuId",skuId);
+            var that = this;
+            httpPost(removeFromCarUrl,data).then(
+                resp=>{
+                    if(isSuccess(resp)) {
+                      that.$message.success('移除商品');
+                      that.getCarInfo();
                     }
                 }
             )
