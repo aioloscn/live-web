@@ -135,10 +135,10 @@
                         <span class="car_item_desc">{{item.skuInfoDTO.name}} 数量：{{item.count}}</span>
                     </div>
                     <div class="pre_order_total_price">
-                        <b>总金额：550旗鱼币</b>
+                        <b>总金额：{{shopCarTotalPrice}}旗鱼币</b>
                     </div>
                     <div style="text-align: center;margin-top: 20px;">   
-                        <el-button type="success" @click="payNow(11)">立马支付</el-button>
+                        <el-button type="success" @click="payNow()">立马支付</el-button>
                     </div>
                     <div style="text-align: center;margin-top: 20px;">   
                         <el-button type="info" @click="turnBackShopCar()">返回购物车</el-button>

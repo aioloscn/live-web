@@ -23,3 +23,4 @@ let addShopCarUrl = server_addr + apiUrl + "/shop/addCar";
 let getCarInfoUrl = server_addr + apiUrl + "/shop/getCarInfo";
 let removeFromCarUrl = server_addr + apiUrl + "/shop/removeFromCar"
 let createPrepareOrderInfoUrl = server_addr + apiUrl + "/shop/prepareOrder";
+let payNowUrl = server_addr + apiUrl +"/shop/payNow";

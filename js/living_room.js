@@ -39,7 +39,8 @@ new Vue({
         shopDetailInfo:{},
         shopCarInfo:[],
         showOrderTab: false,
-        address:''
+        address:'',
+        shopCarTotalPrice:0
     },
 
     mounted() {
@@ -77,8 +78,19 @@ new Vue({
             this.createPrepareOrderInfo();
         },
 
-        payNow:function(orderId) {
-                
+        payNow:function() {
+            let data = new FormData();
+            data.append("roomId",getQueryStr("roomId"));
+            var that = this;
+            httpPost(payNowUrl,data).then(
+                resp=>{
+                    if(isSuccess(resp) && resp.data) {
+                        that.$message.success("支付成功");
+                        that.hiddenGreyTab();
+                        that.listPayProduct();
+                    }
+                }
+            )    
         },
         createPrepareOrderInfo:function() {
             let data = new FormData();
@@ -168,6 +180,7 @@ new Vue({
                     if(isSuccess(resp)) {
                         console.log(resp.data);
                         that.shopCarInfo=resp.data.shopCarItemRespDTOS;
+                        that.shopCarTotalPrice = resp.data.totalPrice;
                     }
                 }
             )
