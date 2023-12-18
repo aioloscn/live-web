@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
     <title>直播间列表页面</title>
     <link rel="stylesheet" href="../css/index.css">
-    <!--            <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> -->
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="../css/living_room_list.css">
     <!-- 引入ElementUI组件库 -->
@@ -26,52 +25,59 @@
                 <span class="top-title">
                     旗鱼直播
                 </span>
-                <span class="top-title top-title-link">
+                <span class="top-title top-title-link" id="default_living_room" @click="chooseLivingType(1,'default_living_room')">
                     直播间
                 </span>
-                <span class="top-title top-title-link">
+                <span class="top-title top-title-link" id="pk_living_room" @click="chooseLivingType(2,'pk_living_room')">
                     主播PK
-                </span>
-                <span class="top-title top-title-link">
-                    周边
-                </span>
-                <span class="top-title top-title-link">
-                    体育
-                </span>
-                <span class="top-title top-title-link">
-                    游戏
                 </span>
                 <span>
                     <input type="search" class="top-search-input" placeholder="输入你想查找的东西">
                 </span>
                 <span v-show="isLogin==false" class="top-title top-login top-title-link" style="margin-left: 200px;"
                     @click="showLoginPopNow()">
-                    {{initInfo}}
+                    {{loginBtnMsg}}
+                </span>
+                <span v-show="isLogin==true" class="top-title top-login" style="margin-top: 10px;">
+                    <span v-show="initInfo.showStartLivingBtn==true">
+                        <button class="start_living_room_btn" @click="showStartLivingRoomTab()">开播</button>
+                    </span>
+                    <span>
+                        <img :src="initInfo.avatar" style="height: 30px;width: 30px;border-radius: 50%;" alt="">
+                    </span>
+                    <span style="position:relative;top: -12px;left:10px;">
+                     {{initInfo.nickName}}
+                    </span>
                 </span>
                 <el-dialog title="选择直播间类型" :visible.sync="startLivingRoomTab" width="30%" center>
-                    <el-button>普通直播间</el-button>
-                    <el-button>pk房</el-button>
+                    <el-button @click="jumpToLivingRoomPage(1)">普通直播间</el-button>
+                    <el-button @click="jumpToLivingRoomPage(2)">pk房</el-button>
                 </el-dialog>
 
             </div>
         </div>
-        <div>
+        <div >
             <div style="text-align: center;margin-bottom: 50px;margin-top: 90px;"></div>
             <div> 
                 <div style="position:relative;
             /*left: 26%;*/
-            top:200px; width: 1000px;margin: auto;padding-top: 50px;">
-                    <el-row :gutter="24">
-                        <el-col :span="6" v-for="item in livingRoomList">
-                            <img :src="item.covertImg" class="living_room_cover">
-                            <div class="living_room_tab">
+            top:200px; width: 1000px;margin: auto;padding-top: 50px;" 
+            >
+                <div>
+                    <div id="living_room_list_div">
+                    <el-row  :gutter="24" >
+                        <el-col :span="6" v-for="item in livingRoomList"  >
+                            <img :src="item.covertImg" class="living_room_cover" @click="jumpToLivingRoom(item.id,item.type)">
+                            <div class="living_room_tab" @click="jumpToLivingRoom(item.id,item.type)">
                                 <img src="../img/head.jpeg" alt="" class="living_room_head">
-                                <span class="living_room_name">直播间名字</span>
-                                <span class="online_count"><i class="el-icon-view"></i>111</span>
-                                <span class="good_count"><i class="el-icon-star-on"></i>22</span>
+                                <span class="living_room_name">{{item.roomName}}</span>
+                                <span class="online_count"><i class="el-icon-view"></i>{{item.watchNum}}</span>
+                                <span class="good_count"><i class="el-icon-star-on"></i>{{item.goodNum}}</span>
                             </div>
                         </el-col>
                     </el-row>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>
