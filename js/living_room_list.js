@@ -38,7 +38,7 @@ new Vue({
 			var that = this;
 			httpPost(homePageUrl,{}).then(resp=>{
 				//登录成功
-				if(resp.data.loginStatus==true) {
+				if(resp.data.loginStatus) {
 					that.initInfo=resp.data;
 					that.loginBtnMsg='';
 					that.isLogin =true;
@@ -57,12 +57,16 @@ new Vue({
 
 		listLivingRoom: function(type) {
 			var that = this;
-			let data = new FormData();
-			data.append("page",this.page);
-			data.append("pageSize",this.pageSize);
-			data.append("type",type);
+			let data = {
+				current: 1,
+				size: 10,
+				data: {
+					type: type
+				}
+			}
+			console.log('list page', data)
 			httpPost(listLivingRoomUrl,data).then(resp=>{
-				console.log('直播间列表');
+				console.log('直播间列表', that.isLogin);
 				//登录成功
 				if(isSuccess(resp)) {
 					that.livingRoomList = resp.data.list;
@@ -86,12 +90,14 @@ new Vue({
 				return;
 			}
 			var that = this;
-			let data = new FormData();
-			data.append("phone",this.mobile);
-			data.append("code",this.code);
+			let data = {
+				phone: this.mobile,
+				code: this.code
+			}
 			//请求登录接口
 			httpPost(loginUrl,data).then(resp=>{
 				//登录成功
+				console.log('mobileLogin', resp)
 				if(resp.code==200) {
 					that.userId=resp.data.userId;
 					that.$message.success('登录成功');
@@ -113,7 +119,7 @@ new Vue({
         },
 
 		jumpToLivingRoomPage(livingType) {
-			console.log(this.isLogin);
+			console.log('isLogin', this.isLogin);
 			if(!this.isLogin) {
 				this.$message.error('请先登录');
 				return;
@@ -164,6 +170,7 @@ new Vue({
 			data.append("phone",this.mobile);
 			//请求短信发送接口
 			httpPost(sendSmsUrl,data).then(resp=>{
+				console.log('sendSmsCode', resp)
 				if(resp.code==200)	{
 					that.hasSendSms = true;
 					//短信发送成功会有一个弹窗
@@ -208,10 +215,13 @@ new Vue({
 					  console.log('滚动到底部了');
 					  //触发第二页的数据加载
 					  that.page = that.page + 1;
-					  let data = new FormData();
-					  data.append("page",that.page);
-					  data.append("pageSize",that.pageSize);
-					  data.append("type",that.listType);
+					  let data = {
+							current: 1,
+							size: 10,
+							data: {
+								type: that.listType
+							}
+						}
 					  httpPost(listLivingRoomUrl,data).then(resp=>{
 							//登录成功
 							if(isSuccess(resp)) {

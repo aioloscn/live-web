@@ -33,7 +33,7 @@ const axiosReq = axios.create({
     timeout: 5000, // 请求超时时间
     withCredentials: true,
     headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/json'
     }
 })
 
