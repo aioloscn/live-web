@@ -43,6 +43,7 @@ new Vue({
 					that.loginBtnMsg='';
 					that.isLogin =true;
 				}
+				console.log('登录状态', that.isLogin);
 			})
 		},
 
@@ -59,17 +60,16 @@ new Vue({
 			var that = this;
 			let data = {
 				current: 1,
-				size: 10,
+				size: that.pageSize,
 				data: {
 					type: type
 				}
 			}
 			console.log('list page', data)
 			httpPost(listLivingRoomUrl,data).then(resp=>{
-				console.log('直播间列表', that.isLogin);
 				//登录成功
 				if(isSuccess(resp)) {
-					that.livingRoomList = resp.data.list;
+					that.livingRoomList = resp.data.records;
 				}
 			})
 		},
@@ -144,10 +144,10 @@ new Vue({
 
         },
 		jumpToLivingRoom(roomId,type) {
-			if(!this.isLogin) {
-				this.$message.error('请先登录');
-				return;
-			}
+			// if(!this.isLogin) {
+			// 	this.$message.error('请先登录');
+			// 	return;
+			// }
 			if(type==1) {
 				window.location.href = "./living_room.html?roomId=" + roomId;
 			} else if(type==2) {
@@ -216,8 +216,8 @@ new Vue({
 					  //触发第二页的数据加载
 					  that.page = that.page + 1;
 					  let data = {
-							current: 1,
-							size: 10,
+							current: that.page,
+							size: that.pageSize,
 							data: {
 								type: that.listType
 							}
@@ -225,7 +225,8 @@ new Vue({
 					  httpPost(listLivingRoomUrl,data).then(resp=>{
 							//登录成功
 							if(isSuccess(resp)) {
-								let livingRoomTempList = resp.data.list;
+								let livingRoomTempList = resp.data.records;
+								console.log('right push', livingRoomTempList)
 								for (i = 0; i < livingRoomTempList.length; i++) {
 									that.livingRoomList.push(livingRoomTempList[i]);
 								}

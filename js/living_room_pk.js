@@ -254,9 +254,9 @@ new Vue({
             } else if (wsData.code == 1003) {
                 let respData = JSON.parse(utf8ByteToUnicodeStr(wsData.body));
                 //属于直播间内的聊天消息
-                if (respData.bizCode == 5555) {
+                if (respData.bizCode == 2222) {
                     let respMsg = JSON.parse(respData.data);
-                    let sendMsg = { "content": respMsg.content, "senderName": respMsg.senderName, "senderImg": respMsg.senderAvtar };
+                    let sendMsg = { "content": respMsg.content, "senderName": respMsg.senderName, "senderImg": respMsg.senderAvatar };
                     let msgWrapper = { "msgType": 1, "msg": sendMsg };
                     console.log(sendMsg);
                     this.chatList.push(msgWrapper);
@@ -300,7 +300,7 @@ new Vue({
         sendAckCode: function (respData) {
             let jsonStr = { "userId": this.initInfo.userId, "appId": 10001, "msgId": respData.msgId };
             let bodyStr = JSON.stringify(jsonStr);
-            let ackMsgStr = { "magic": 19231, "code": 1005, "len": bodyStr.length, "body": bodyStr };
+            let ackMsgStr = { "magic": 12345, "code": 1005, "len": bodyStr.length, "body": bodyStr };
             this.websocketSend(JSON.stringify(ackMsgStr));
         },
 
@@ -318,7 +318,7 @@ new Vue({
             //发送一个心跳包给到服务端
             let jsonStr = { "userId": this.initInfo.userId, "appId": 10001 };
             let bodyStr = JSON.stringify(jsonStr);
-            let heartBeatJsonStr = { "magic": 19231, "code": 1004, "len": bodyStr.length, "body": bodyStr };
+            let heartBeatJsonStr = { "magic": 12345, "code": 1004, "len": bodyStr.length, "body": bodyStr };
             setInterval(function () {
                 that.websocketSend(JSON.stringify(heartBeatJsonStr));
             }, 3000);
@@ -348,12 +348,12 @@ new Vue({
             let msgWrapper = { "msgType": 1, "msg": sendMsg };
             this.chatList.push(msgWrapper);
             //发送评论消息给到im服务器
-            let msgBody = { "roomId": this.roomId, "type": 1, "content": this.form.review, "senderName": this.initInfo.watcherNickName, "senderAvtar": this.initInfo.watcherAvatar };
+            let msgBody = { "roomId": this.roomId, "type": 1, "content": this.form.review, "senderName": this.initInfo.watcherNickName, "senderAvatar": this.initInfo.watcherAvatar };
             console.log(this.initInfo);
-            let jsonStr = { "userId": this.initInfo.userId, "appId": 10001, "bizCode": 5555, "data": JSON.stringify(msgBody) };
+            let jsonStr = { "userId": this.initInfo.userId, "appId": 10001, "bizCode": 2222, "data": JSON.stringify(msgBody) };
             let bodyStr = JSON.stringify(jsonStr);
             console.log('发送消息');
-            let reviewMsg = { "magic": 19231, "code": 1003, "len": bodyStr.length, "body": bodyStr };
+            let reviewMsg = { "magic": 12345, "code": 1003, "len": bodyStr.length, "body": bodyStr };
             console.log(JSON.stringify(reviewMsg));
             this.websocketSend(JSON.stringify(reviewMsg));
             this.form.review = '';
