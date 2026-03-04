@@ -441,6 +441,7 @@ new Vue({
             let bodyStr = JSON.stringify(jsonStr);
             let ackMsgStr = {"magic": 12345, "code": 1005, "len": bodyStr.length, "body": bodyStr};
             this.websocketSend(JSON.stringify(ackMsgStr));
+            console.log('发送ack消息')
         },
  
         websocketSend:function (data) {//数据发送
