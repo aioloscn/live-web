@@ -12,7 +12,7 @@
     <script src="../js/index.js"></script>
     <!-- 常用http请求，axios实现 -->
     <script src="../js/axios.min.js"></script>
-    <script src="../js/constants.js?v=20260306"></script>
+    <script src="../js/constants.js?v=20260306_2"></script>
 </head>
 
 <body class="main-content">
@@ -48,6 +48,9 @@
                     <span style="position:relative;top: -12px;left:10px;">
                      {{initInfo.nickName}}
                     </span>
+                    <span style="position:relative;top: -12px;left:20px;cursor:pointer;color:#999;" @click="logout">
+                        退出
+                    </span>
                 </span>
                 <el-dialog title="选择直播间类型" :visible.sync="startLivingRoomTab" width="30%" center>
                     <el-button @click="jumpToLivingRoomPage(1)">普通直播间</el-button>
@@ -81,7 +84,7 @@
     </div>
 
 </body>
-<script src="../js/utils.js?v=20260306"></script>
-<script src="../js/living_room_list.js?v=20260306"></script>
+<script src="../js/utils.js?v=20260306_2"></script>
+<script src="../js/living_room_list.js?v=20260306_2"></script>
 
 </html>

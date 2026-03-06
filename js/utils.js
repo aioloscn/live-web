@@ -25,8 +25,10 @@ function deleteCookie(name, path) {
 }
 
 function logout() {
-    deleteCookie("ztscrip", "/");
-    window.location.href = '../common/admin_login.html';
+    httpPost(server_addr + userUrl + "/user/logout", {}).then(resp => {
+        deleteCookie("ztscrip", "/");
+        window.location.reload();
+    });
 }
 
 const axiosReq = axios.create({

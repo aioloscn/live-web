@@ -70,6 +70,9 @@ new Vue({
 		showLoginPopNow: function () {
 			this.goToLoginCenter();
 		},
+		logout: function() {
+			window.logout();
+		},
 		buildLoginCenterUrl: function () {
 			var currentUrl = window.location.href;
 			var target = loginCenterUrl || "";
