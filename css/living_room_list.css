@@ -1,87 +1,158 @@
-.living_room_cover {
-    border-radius: 5px;
-    border: solid 3px rgba(38, 38, 38, 0);
-    /*margin: auto;*/
-    margin-right: 20px;
-    text-align: center;
+/* Dark Theme Overrides for List Page */
+body {
+    background-color: #161823 !important; /* Override common.css .main-content */
+    color: #fff;
+    margin: 0;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.top-tab {
+    height: 60px;
+    background-color: #161823;
+    border-bottom: 1px solid #2e3244;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.top-tab > div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.top-logo { 
+    height: 30px; 
+    margin: 0;
+    margin-right: 10px; 
+    border-radius: 50%; 
+}
+.top-title { color: #fff; margin-right: 20px; font-size: 16px; cursor: pointer; }
+.top-title:hover { color: #fe2c55; }
+.top-title-link { color: #999; }
+.top-search-input {
+    background: #252632;
+    border: none;
+    border-radius: 18px;
+    color: #fff;
+    padding: 8px 15px;
+    outline: none;
     width: 250px;
-    height: 250px;
+    margin-left: 20px;
+}
+.top-login { color: #fff; margin-left: auto; display: flex; align-items: center; cursor: pointer; }
+
+/* Main Content Adjustment */
+#living_room_list_div {
+    padding-top: 80px; /* Space for fixed header */
+    width: 1200px;
+    margin: 0 auto;
 }
 
-.living_room_item {
-    margin-right: 20px;
+/* Grid Layout */
+.el-row {
+    margin: 0 !important;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
+.el-col-6 {
+    width: 280px; /* Fixed width for cards */
+    margin: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
 
-.living_room_cover:hover {
-    border: solid 3px rgba(216, 216, 216, 0.86);
+.el-col-6:hover {
+    transform: translateY(-5px);
+}
+
+.living_room_cover {
+    width: 100%;
+    height: 157px; /* 16:9 ratio approx */
+    border-radius: 8px;
+    object-fit: cover;
+    border: none;
+    display: block;
 }
 
 .living_room_tab {
-    margin-left: -49px;
-    z-index: 9;
-    position: relative;
-    left: 52px;
-    top: -46px;
-    color: #666;
-    width: 240px;
-    height: 40px;
-    background-color: white;
-    padding-top: 10px;
-    padding-left: 10px;
-    font-size: 13px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 0 0 8px 8px;
+    margin: 0;
+    top: auto;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
 }
-.living_room_head{
-    width: 30px;
-    height: 30px;
+
+.living_room_head {
+    position: absolute;
+    top: -15px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    position: relative;
-    left: 5px;
+    border: 2px solid #161823;
 }
-.living_room_name{
-    position: relative;
-    top: -38px;
-    left: 45px;
+
+.living_room_name {
+    display: block;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    -o-text-overflow: ellipsis;
-    white-space:nowrap;
-    display: block;
-    width: 150px;
+    margin-left: 45px; /* Space for avatar */
+    margin-bottom: 5px;
+    text-align: left;
+    width: calc(100% - 45px);
+    top: 0; left: 0;
 }
 
-.online_count{
-    margin-left: 15px;
-    position: relative;
-    top: -35px;
-    left: 30px;
-    color: #7baaca;
+.stats-row {
+    display: flex;
+    align-items: center;
+    margin-left: 45px;
 }
 
-.good_count{
-    color: orange;
-    margin-left: 10px;
-    position: relative;
-    top: -35px;
-    left: 29px;
+.online_count, .good_count {
+    font-size: 12px;
+    color: #ccc;
+    margin: 0;
+    position: static;
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.online_count i, .good_count i {
+    margin-right: 4px;
 }
 
 .start_living_room_btn {
-    position:relative;
-    top: -12px;
-    left: -20px;
-    border: solid 0px;
-    padding: 10px;
-    background-color: orange;
+    background-color: #fe2c55;
     color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
-/*.living_room_cover_des {*/
-/*    background-color: white;*/
-/*    height: 40px;*/
-/*    width: 252px;*/
-/*    color: #666;*/
-/*    padding-left: 20px;*/
-/*    padding-top: 15px;*/
-/*    font-size: 14px;*/
-/*}*/
+/* Remove old messy styles */
+.living_room_item { margin: 0; }
+.living_room_cover:hover { border: none; }

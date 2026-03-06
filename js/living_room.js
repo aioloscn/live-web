@@ -11,7 +11,7 @@ new Vue({
         parser: {},
         websock: null,
         roomId: -1,
-        anchorId: -1,
+        userId: -1,
         isLogin: false,
         wsServer: '',
         initInfo: {},
@@ -230,7 +230,7 @@ new Vue({
 			data.append("giftId",giftId);
             data.append("type",0);
             data.append("roomId",getQueryStr("roomId"));
-            data.append("receiverId",this.initInfo.anchorId);
+            data.append("receiverId",this.initInfo.userId);
             let that = this;
             httpPost(sendGiftUrl, data)
             .then(resp => {
@@ -288,6 +288,7 @@ new Vue({
             httpPost(anchorConfigUrl, data)
                 .then(resp => {
                     if (isSuccess(resp)) {
+                        console.log('anchor config', resp.data)
                         if(resp.data.roomId>0) {
                             that.initInfo = resp.data;
                             that.connectImServer();
@@ -340,11 +341,25 @@ new Vue({
             .then(resp => {
                 if (isSuccess(resp)) {
                     that.imServerConfig = resp.data;
-                    let url = "ws://"+that.imServerConfig.wsImServerAddress+"/" + that.imServerConfig.token+"/"+that.initInfo.userId+"/1001/"+this.roomId;
+                    // 生产环境用 wss://
+                    let url = "ws://"+that.imServerConfig.wsImServerAddress+"/im?token=" + that.imServerConfig.token+"&userId="+that.initInfo.userId+"&roomId="+that.roomId;
                     console.log(url);
-                    that.websock = new WebSocket(url);
-                    that.websock.onmessage = that.websocketOnMessage;
+                    const authInfo = {
+                        token: that.imServerConfig.token,
+                        userId: that.initInfo.userId,
+                        roomId: that.roomId,
+                        appId: 10001    // 直播业务的appId，未登录用户无法从token中解析出，写死
+                    }
+                    const base64Data = btoa(JSON.stringify(authInfo))
+                        .replace(/=/g, '')
+                        .replace(/\+/g, '-')
+                        .replace(/\//g, '_');
+                    console.log('authInfo', authInfo)
+                    console.log('base64', base64Data)
+                    that.websock = new WebSocket(`ws://${that.imServerConfig.wsImServerAddress}`, ['auth-protocol', base64Data]);
+                    
                     that.websock.onopen = that.websocketOnOpen;
+                    that.websock.onmessage = that.websocketOnMessage;
                     that.websock.onerror = that.websocketOnError;
                     that.websock.onclose = that.websocketClose;
                     console.log('初始化ws服务器');
@@ -362,18 +377,39 @@ new Vue({
             console.error('出现异常');
         },
 
-        websocketOnMessage: function(e) { //数据接收
+        parseWsData: function(wsData) {
+            // Base64 解码 → 转 UTF-8 字符串 → 解析 JSON
+            const binaryString = atob(wsData.body);
+            const bytes = Uint8Array.from(binaryString, (char) => char.charCodeAt(0));
+            const jsonString = new TextDecoder('utf-8').decode(bytes);
+            return JSON.parse(jsonString);
+        },
+
+        // 添加 Base64 编码方法，支持中文
+        encodeBody: function(str) {
+            return window.btoa(unescape(encodeURIComponent(str)));
+        },
+
+        websocketOnMessage: function(e) {
             let wsData = JSON.parse(e.data);
+            console.log('数据接收', wsData)
             if(wsData.code == 1001) {
+                const respBody = this.parseWsData(wsData);
+                console.log('resp body', respBody)
+                if (JSON.parse(respBody.data).type == 'ANONYMOUS') {
+                    console.log('访客', respBody.userId);
+                    localStorage.setItem('anonUserId', respBody.userId);
+                }
                 this.startHeartBeatJob();
             } else if (wsData.code == 1003) {
-                let respData = JSON.parse(utf8ByteToUnicodeStr(wsData.body));
+                const respBody = this.parseWsData(wsData);
                 //属于直播间内的聊天消息
-                if(respData.bizCode==5555) {
-                    let respMsg = JSON.parse(respData.data);
-                    let sendMsg = {"content": respMsg.content, "senderName": respMsg.senderName, "senderImg": respMsg.senderAvtar};
+                console.log('ImMsgbody', respBody)
+                if(respBody.bizCode==2222) {
+                    let respMsg = JSON.parse(respBody.data);
+                    let sendMsg = {"content": respMsg.content, "senderName": respMsg.senderName, "senderImg": respMsg.senderAvatar};
                     let msgWrapper = {"msgType": 1, "msg": sendMsg};
-                    console.log(sendMsg);
+                    console.log('ImMsgBody data', sendMsg);
                     this.chatList.push(msgWrapper);
                     //注意让滑轮滚到底
                     this.$nextTick(() => {
@@ -381,19 +417,19 @@ new Vue({
                         div.scrollTop = div.scrollHeight
                     })
                     //发送ack确认消息
-                } else if(respData.bizCode == 5556) {
+                } else if(respBody.bizCode == 5556) {
                     //送礼成功
-                    let respMsg = JSON.parse(respData.data);
+                    let respMsg = JSON.parse(respBody.data);
                     this.playGiftSvga(respMsg.url);
-                } else if(respData.bizCode == 5557){
+                } else if(respBody.bizCode == 5557){
                     //送礼失败
-                    let respMsg = JSON.parse(respData.data);
+                    let respMsg = JSON.parse(respBody.data);
                     this.$message.error(respMsg.msg);
-                } else if (respData.bizCode == 5560) {
+                } else if (respBody.bizCode == 5560) {
                     if(!this.startingRedPacket) {
                         this.startingRedPacket=true;
                         //开始红包雨活动
-                        let respMsg = JSON.parse(respData.data);
+                        let respMsg = JSON.parse(respBody.data);
                         let redPacketConfig = JSON.parse(respMsg.redPacketConfig);
                         console.log(redPacketConfig.totalCount);
                         console.log(redPacketConfig.configCode);
@@ -401,19 +437,25 @@ new Vue({
                     }
                    
                 }
-                this.sendAckCode(respData);
+                this.sendAckCode(respBody);
             }
         },
 
-        sendAckCode: function(respData) {
-            let jsonStr = {"userId": this.initInfo.userId, "appId": 10001,"msgId":respData.msgId};
+        sendAckCode: function(respBody) {
+            let jsonStr = {"userId": this.initInfo.userId, "appId": 10001,"msgId":respBody.msgId};
             let bodyStr = JSON.stringify(jsonStr);
-            let ackMsgStr = {"magic": 19231, "code": 1005, "len": bodyStr.length, "body": bodyStr};
+            let bodyBase64 = this.encodeBody(bodyStr);
+            let ackMsgStr = {"magic": 12345, "code": 1005, "len": bodyBase64.length, "body": bodyBase64};
             this.websocketSend(JSON.stringify(ackMsgStr));
+            console.log('发送ack消息')
         },
  
         websocketSend:function (data) {//数据发送
-            this.websock.send(data);
+            if (this.websock && this.websock.readyState === WebSocket.OPEN) {
+                this.websock.send(data);
+            } else {
+                console.warn("WebSocket 未连接，无法发送数据");
+            }
         },
 
         websocketClose: function(e) {  //关闭
@@ -426,10 +468,14 @@ new Vue({
             //发送一个心跳包给到服务端
             let jsonStr = {"userId": this.initInfo.userId, "appId": 10001};
             let bodyStr = JSON.stringify(jsonStr);
-            let heartBeatJsonStr = {"magic": 19231, "code": 1004, "len": bodyStr.length, "body": bodyStr};
+            let bodyBase64 = that.encodeBody(bodyStr);
+            let heartBeatJsonStr = {"magic": 12345, "code": 1004, "len": bodyBase64.length, "body": bodyBase64};
             setInterval(function () {
-                that.websocketSend(JSON.stringify(heartBeatJsonStr));
-            }, 3000);
+                if (that.websock && that.websock.readyState === WebSocket.OPEN) {
+                    that.websocketSend(JSON.stringify(heartBeatJsonStr));
+                    console.log('发送心跳包时间: ', new Date().toLocaleString())
+                }
+            }, 30000);
         },
 
         closeLivingRoom: function() {
@@ -452,16 +498,24 @@ new Vue({
                 });
                 return;
             }
+            if (this.initInfo.userId == null || this.initInfo.userId < 0) {
+                this.$message({
+                    message: "请先登录",
+                    type: 'warning'
+                });
+                return;
+            }
             let sendMsg = {"content": this.form.review, "senderName": this.initInfo.nickName, "senderImg": this.initInfo.avatar};
             let msgWrapper = {"msgType": 1, "msg": sendMsg};
             this.chatList.push(msgWrapper);
             //发送评论消息给到im服务器
-            let msgBody = {"roomId":this.roomId,"type":1,"content":this.form.review,  "senderName": this.initInfo.nickName, "senderAvtar": this.initInfo.avatar};
+            let msgBody = {"roomId":this.roomId,"type":1,"content":this.form.review,  "senderName": this.initInfo.nickName, "senderAvatar": this.initInfo.avatar};
             console.log(this.initInfo);
-            let jsonStr = {"userId": this.initInfo.userId, "appId": 10001,"bizCode":5555,"data":JSON.stringify(msgBody)};
+            let jsonStr = {"userId": this.initInfo.userId, "appId": 10001,"bizCode":2222,"data":JSON.stringify(msgBody)};
             let bodyStr = JSON.stringify(jsonStr);
-            console.log('发送消息');
-            let reviewMsg = {"magic": 19231, "code": 1003, "len": bodyStr.length, "body": bodyStr};
+            let bodyBase64 = this.encodeBody(bodyStr);
+            console.log('发送消息', bodyStr);
+            let reviewMsg = {"magic": 12345, "code": 1003, "len": bodyBase64.length, "body": bodyBase64};
             console.log(JSON.stringify(reviewMsg));
             this.websocketSend(JSON.stringify(reviewMsg));
             this.form.review = '';

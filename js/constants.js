@@ -1,14 +1,17 @@
-let server_addr="http://app.qiyu.live.com";
+let server_addr="http://live.aiolos.com";
+window.loginCenterUrl = "http://www.aiolos.com:5502/";
 
-let apiUrl = "/live/api";
-let sendSmsUrl = server_addr + apiUrl + "/userLogin/sendLoginCode";
-let loginUrl = server_addr + apiUrl + "/userLogin/login";
-let homePageUrl = server_addr + apiUrl + "/home/initPage";
-let startLiving = server_addr + apiUrl + "/living/startingLiving";
-let closeLiving = server_addr + apiUrl + "/living/closeLiving";
-let anchorConfigUrl = server_addr + apiUrl + "/living/anchorConfig";
-let listLivingRoomUrl = server_addr + apiUrl +"/living/list";
-let getImConfigUrl = server_addr + apiUrl + "/im/getImConfig";
+let apiUrl = "/live-api";
+let imUrl = "/live-im-provider"
+let livingUrl = "/live-living-provider"
+let userUrl = "/badger-user-provider"
+
+let homePageUrl = server_addr + livingUrl + "/home/init-page";
+let startLiving = server_addr + livingUrl + "/living-room/start-streaming";
+let closeLiving = server_addr + livingUrl + "/living-room/stop-streaming";
+let anchorConfigUrl = server_addr + livingUrl + "/living-room/anchor-config";
+let listLivingRoomUrl = server_addr + livingUrl +"/living-room/list";
+let getImConfigUrl = server_addr + imUrl + "/im/get-im-config";
 let listGiftConfigUrl = server_addr + apiUrl + "/gift/listGift";
 let sendGiftUrl = server_addr + apiUrl + "/gift/send";
 let payProductsUrl = server_addr + apiUrl + "/bank/products";
