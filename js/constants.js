@@ -1,16 +1,16 @@
 let server_addr="http://live.aiolos.com";
+window.loginCenterUrl = "http://www.aiolos.com:5502/";
 
 let apiUrl = "/live-api";
-let userUrl = "/live-user-provider"
 let imUrl = "/live-im-provider"
+let livingUrl = "/live-living-provider"
+let userUrl = "/badger-user-provider"
 
-let sendSmsUrl = server_addr + apiUrl + "/sms/send-sms";
-let loginUrl = server_addr + userUrl + "/user/login";
-let homePageUrl = server_addr + apiUrl + "/home/init-page";
-let startLiving = server_addr + apiUrl + "/living-room/start-streaming";
-let closeLiving = server_addr + apiUrl + "/living-room/stop-streaming";
-let anchorConfigUrl = server_addr + apiUrl + "/living-room/anchor-config";
-let listLivingRoomUrl = server_addr + apiUrl +"/living-room/list";
+let homePageUrl = server_addr + livingUrl + "/home/init-page";
+let startLiving = server_addr + livingUrl + "/living-room/start-streaming";
+let closeLiving = server_addr + livingUrl + "/living-room/stop-streaming";
+let anchorConfigUrl = server_addr + livingUrl + "/living-room/anchor-config";
+let listLivingRoomUrl = server_addr + livingUrl +"/living-room/list";
 let getImConfigUrl = server_addr + imUrl + "/im/get-im-config";
 let listGiftConfigUrl = server_addr + apiUrl + "/gift/listGift";
 let sendGiftUrl = server_addr + apiUrl + "/gift/send";

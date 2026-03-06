@@ -88,10 +88,10 @@
     </div>
     <div class="grey_bg" v-show="showShopTab==true || showCarTab==true" @click="hiddenGreyTab()">
     </div>
-    <el-row :gutter="20" style="margin-top: 100px;">
-        <el-col :span="4">&nbsp;
-        </el-col>
-        <el-col :span="11">
+    
+    <div class="live-container">
+        <!-- Video Area -->
+        <div class="video-area">
             <div class="shop_info">
                 <div class="shop_img_head">
                     <b>秒杀商品</b>
@@ -148,7 +148,7 @@
 
    
             <div class="liveroom_top">
-                <div style="position: relative;top: -30px;">
+                <div style="position: relative;top: 10px;">
                     <div class="anchor_name">
                         <div style="display: inline-block;">{{initInfo.nickName}}</div>
                         <img src="../img/living.jpg" class="anchor_label" alt="">
@@ -159,9 +159,12 @@
 
             <div id="svga-wrap" class="svga-wrap">
             </div>    
-            <video :poster="initInfo.avatar" width="100%" style="background-color: rgb(18, 9, 37);">
-                <!-- <source src="test.mp4"> -->
-            </video>
+            <div class="video-wrapper">
+                <video :poster="initInfo.avatar" width="100%" height="100%" style="background-color: #000; object-fit: contain;">
+                    <!-- <source src="test.mp4"> -->
+                </video>
+            </div>
+            
             <div class="gift_content">
                 <div class="gift_content_title">礼物面板</div>
                 <div class="bank_tab" >
@@ -170,21 +173,24 @@
                         type="danger" class="prepare_red_packet" @click="prepareRedPacket">红包雨预热</el-button>
                     </span> -->
 
-                    <span style="position: relative;left: -50px;" @click ="toShowCarTab()">  
+                    <span style="position: relative;left: -50px; cursor: pointer;" @click ="toShowCarTab()">  
                         查看购物车
                     </span>
-                    <span @click="showBankInfoTab()">
+                    <span @click="showBankInfoTab()" style="cursor: pointer;">
                         钱包余额:
                     </span>
                     <span style="color: white">{{currentBalance}}</span>
                 </div>
-                <div class="gift_item" v-for="item in giftList">
-                    <img @click="sendGift(item.giftId)" :src="item.coverImgUrl" class="gift_img" alt="">
-                    <div class="gift_item_name">{{item.giftName}}</div>
-                    <div class="gift_item_price">{{item.price}}斗鱼币</div>
+                <div class="gift_list_scroll">
+                    <div class="gift_item" v-for="item in giftList">
+                        <img @click="sendGift(item.giftId)" :src="item.coverImgUrl" class="gift_img" alt="">
+                        <div class="gift_item_name">{{item.giftName}}</div>
+                        <div class="gift_item_price">{{item.price}}斗鱼币</div>
+                    </div>
                 </div>
             </div>
-        </el-col>
+        </div>
+
         <div class="grey_bg" v-show="showBankInfo==true" @click="hiddenBankInfoTabNow()">
         </div>
         <div class="recharge_tab" v-show="showBankInfo==true">
@@ -207,44 +213,46 @@
                     <img src="../img/qr-code.png" style="height: 180px;width: 180px;" alt="">
                     <div style="font-size: 13px;color: #a4a4a4">
                         请使用 <img style="display: inline-block;width: 13px;height: 13px;position:relative;top: 1px;" src="../img/zfb.jpg"> 支付宝/
-                        <img style="display: inline-block;width: 13px;height: 13px;position:relative;top: 1px;" src="../img/wx.jpg"> 微信 扫码支付 
+                        <img style="display: inline-block;width: 13px;height: 13px;position:relative;top: 1px;" src="../img/wx.jpg"> 微信 扫码支付
                     </div>
                 </div>
             </div>
         </div>
-        <el-col :span="5">
+        
+        <!-- Chat Area -->
+        <div class="chat-area">
             <div class="talk-content-box" id="talk-content-box">
-                <div style="margin-left: 20px;margin-top: 20px;" v-for='chatItem in chatList'>
-                    <div v-show="chatItem.msgType==5">
+                <div class="chat-message-item" v-for='chatItem in chatList'>
+                    <div v-show="chatItem.msgType==5" class="gift-message">
                         <div class="gift_msg">
                             {{chatItem.msg}}
                         </div>
                     </div>
-                    <div v-show="chatItem.msgType==1">
-                        <div class="user-name">{{chatItem.msg.senderName}}</div>
-                        <img :src="chatItem.msg.senderImg" class="chat-avatar">
-                    </div>
-                    <div class="chat-content" v-show="chatItem.msgType==1">
-                        {{chatItem.msg.content}}
+                    <div v-show="chatItem.msgType==1" class="user-message">
+                        <div class="user-info-row">
+                            <img :src="chatItem.msg.senderImg" class="chat-avatar">
+                            <span class="user-name">{{chatItem.msg.senderName}}</span>
+                        </div>
+                        <div class="chat-content">
+                            {{chatItem.msg.content}}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div>
-                <br>
+            <div class="chat-input-area">
                 <el-form ref="form" @submit.native.prevent>
                     <el-form-item>
-                        <el-input v-model="form.review" @keyup.enter.native="sendReview" placeholder="发送直播评论"></el-input>
+                        <el-input v-model="form.review" @keyup.enter.native="sendReview" placeholder="和主播聊聊天..." class="dark-input"></el-input>
                     </el-form-item>
                     <el-form-item style="text-align:right;">
-                        <el-button type="danger" v-if="showPrepareBtn" @click="prepareRedPacket">初始化红包雨</el-button>
-                        <el-button type="success" v-if="showStartBtn" @click="startSendRedPacket">开始派发红包雨</el-button>
-                        <el-button type="primary" @click="sendReview">发送消息</el-button>
+                        <el-button type="danger" v-if="showPrepareBtn" @click="prepareRedPacket" size="small">红包雨</el-button>
+                        <el-button type="success" v-if="showStartBtn" @click="startSendRedPacket" size="small">开始</el-button>
+                        <el-button type="primary" @click="sendReview" size="small" class="send-btn">发送</el-button>
                     </el-form-item>
                 </el-form>
             </div>
-
-        </el-col>
-    </el-row>
+        </div>
+    </div>
 </div>
 <script src="../js/axios.min.js"></script>
 <script src="../js/constants.js"></script>

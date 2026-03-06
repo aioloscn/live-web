@@ -385,6 +385,11 @@ new Vue({
             return JSON.parse(jsonString);
         },
 
+        // 添加 Base64 编码方法，支持中文
+        encodeBody: function(str) {
+            return window.btoa(unescape(encodeURIComponent(str)));
+        },
+
         websocketOnMessage: function(e) {
             let wsData = JSON.parse(e.data);
             console.log('数据接收', wsData)
@@ -439,13 +444,18 @@ new Vue({
         sendAckCode: function(respBody) {
             let jsonStr = {"userId": this.initInfo.userId, "appId": 10001,"msgId":respBody.msgId};
             let bodyStr = JSON.stringify(jsonStr);
-            let ackMsgStr = {"magic": 12345, "code": 1005, "len": bodyStr.length, "body": bodyStr};
+            let bodyBase64 = this.encodeBody(bodyStr);
+            let ackMsgStr = {"magic": 12345, "code": 1005, "len": bodyBase64.length, "body": bodyBase64};
             this.websocketSend(JSON.stringify(ackMsgStr));
             console.log('发送ack消息')
         },
  
         websocketSend:function (data) {//数据发送
-            this.websock.send(data);
+            if (this.websock && this.websock.readyState === WebSocket.OPEN) {
+                this.websock.send(data);
+            } else {
+                console.warn("WebSocket 未连接，无法发送数据");
+            }
         },
 
         websocketClose: function(e) {  //关闭
@@ -458,10 +468,13 @@ new Vue({
             //发送一个心跳包给到服务端
             let jsonStr = {"userId": this.initInfo.userId, "appId": 10001};
             let bodyStr = JSON.stringify(jsonStr);
-            let heartBeatJsonStr = {"magic": 12345, "code": 1004, "len": bodyStr.length, "body": bodyStr};
+            let bodyBase64 = that.encodeBody(bodyStr);
+            let heartBeatJsonStr = {"magic": 12345, "code": 1004, "len": bodyBase64.length, "body": bodyBase64};
             setInterval(function () {
-                that.websocketSend(JSON.stringify(heartBeatJsonStr));
-                console.log('发送心跳包时间: ', new Date().toLocaleString())
+                if (that.websock && that.websock.readyState === WebSocket.OPEN) {
+                    that.websocketSend(JSON.stringify(heartBeatJsonStr));
+                    console.log('发送心跳包时间: ', new Date().toLocaleString())
+                }
             }, 30000);
         },
 
@@ -500,8 +513,9 @@ new Vue({
             console.log(this.initInfo);
             let jsonStr = {"userId": this.initInfo.userId, "appId": 10001,"bizCode":2222,"data":JSON.stringify(msgBody)};
             let bodyStr = JSON.stringify(jsonStr);
-            console.log('发送消息');
-            let reviewMsg = {"magic": 12345, "code": 1003, "len": bodyStr.length, "body": bodyStr};
+            let bodyBase64 = this.encodeBody(bodyStr);
+            console.log('发送消息', bodyStr);
+            let reviewMsg = {"magic": 12345, "code": 1003, "len": bodyBase64.length, "body": bodyBase64};
             console.log(JSON.stringify(reviewMsg));
             this.websocketSend(JSON.stringify(reviewMsg));
             this.form.review = '';

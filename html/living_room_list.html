@@ -12,7 +12,7 @@
     <script src="../js/index.js"></script>
     <!-- 常用http请求，axios实现 -->
     <script src="../js/axios.min.js"></script>
-    <script src="../js/constants.js"></script>
+    <script src="../js/constants.js?v=20260306"></script>
 </head>
 
 <body class="main-content">
@@ -57,73 +57,31 @@
             </div>
         </div>
         <div >
-            <div style="text-align: center;margin-bottom: 50px;margin-top: 90px;"></div>
+            <!-- <div style="text-align: center;margin-bottom: 50px;margin-top: 90px;"></div> -->
             <div> 
-                <div style="position:relative;
-            /*left: 26%;*/
-            top:200px; width: 1000px;margin: auto;padding-top: 50px;" 
-            >
-                <div>
-                    <div id="living_room_list_div">
-                    <el-row  :gutter="24" >
-                        <el-col :span="6" v-for="item in livingRoomList"  >
-                            <img :src="item.covertImg" class="living_room_cover" @click="jumpToLivingRoom(item.id,item.type)">
-                            <div class="living_room_tab" @click="jumpToLivingRoom(item.id,item.type)">
-                                <img src="../img/head.jpeg" alt="" class="living_room_head">
-                                <span class="living_room_name">{{item.roomName}}</span>
-                                <span class="online_count"><i class="el-icon-view"></i>{{item.watchCount}}</span>
-                                <span class="good_count"><i class="el-icon-star-on"></i>{{item.likeCount}}</span>
+                <div id="living_room_list_div">
+                    <el-row :gutter="24">
+                        <el-col :span="6" v-for="item in livingRoomList" :key="item.id">
+                            <div class="living-room-card" @click="jumpToLivingRoom(item.id,item.type)">
+                                <img :src="item.covertImg" class="living_room_cover">
+                                <div class="living_room_tab">
+                                    <img src="../img/head.jpeg" alt="" class="living_room_head">
+                                    <span class="living_room_name">{{item.roomName}}</span>
+                                    <div class="stats-row">
+                                        <span class="online_count"><i class="el-icon-view"></i>{{item.watchCount}}</span>
+                                        <span class="good_count"><i class="el-icon-star-on"></i>{{item.likeCount}}</span>
+                                    </div>
+                                </div>
                             </div>
                         </el-col>
                     </el-row>
-                    </div>
-                </div>
                 </div>
             </div>
-        </div>
-        <div class="grey_bg" v-show="showLoginPop==true" @click="hiddenLoginPopNow()"></div>
-        <div class="login_pop" v-show="showLoginPop==true">
-            <div>
-                <span>
-                    <img src="../img/livingroom.jpg" alt=""
-                        style="width: 30px;height: 30px;position:relative; top: 20px;left: 40px;">
-                </span>
-                <span style="position: relative;top: 10px;left: 40px;">
-                    快速登录
-                </span>
-            </div>
-            <div style="position: relative;top: -6%;left: 2%;">
-                <div class="login_input_line">
-                    <span style="margin-right: 20px;">
-                        手机号
-                    </span>
-                    <span>
-                        <input type="tel" class="login_input" v-model="mobile">
-                    </span>
-                </div>
-                <div class="login_input_line" style="margin-top: 20px;">
-                    <span style="margin-right: 20px;">
-                        验证码
-                    </span>
-                    <span>
-                        <input type="tel" class="login_input" v-model="code" style="width: 30%;">
-                        <template>
-                            <button class="login_sms_code" @click="sendSmsCode()">{{loginCodeBtn}}</button>
-                        </template>
-                    </span>
-                </div>
-                <div class="login_input_line" style="margin-top: 20px;">
-                    <span>
-                        <input type="submit" class="login_input login_btn" @click="mobileLogin()" value="登 录">
-                    </span>
-                </div>
-            </div>
-
         </div>
     </div>
 
 </body>
-<script src="../js/utils.js"></script>
-<script src="../js/living_room_list.js"></script>
+<script src="../js/utils.js?v=20260306"></script>
+<script src="../js/living_room_list.js?v=20260306"></script>
 
 </html>

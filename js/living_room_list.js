@@ -2,12 +2,6 @@ new Vue({
 	el: '#app',
 	data: {
 		userId: 0,
-		showLoginPop: false,
-		loginCodeBtn: '验证码',
-		lastTime: 60,
-		mobile: '',
-		code: '',
-		hasSendSms: false,
 		livingRoomList: {},
 		isLogin: false,
 		initInfo: {},
@@ -74,41 +68,24 @@ new Vue({
 			})
 		},
 		showLoginPopNow: function () {
-			this.showLoginPop = true;
+			this.goToLoginCenter();
 		},
-		hiddenLoginPopNow: function () {
-			this.showLoginPop = false;
+		buildLoginCenterUrl: function () {
+			var currentUrl = window.location.href;
+			var target = loginCenterUrl || "";
+			if (!target) {
+				return "";
+			}
+			var joiner = target.indexOf("?") >= 0 ? "&" : "?";
+			return target + joiner + "redirect=" + encodeURIComponent(currentUrl);
 		},
-
-		mobileLogin: function () {
-			if (this.code == '') {
-				this.$message.error('请输入验证码');
+		goToLoginCenter: function () {
+			var redirectUrl = this.buildLoginCenterUrl();
+			if (!redirectUrl) {
+				this.$message.error("登录中心地址未配置");
 				return;
 			}
-			var checkStatus = this.checkPhone();
-			if(!checkStatus) {
-				return;
-			}
-			var that = this;
-			let data = {
-				phone: this.mobile,
-				code: this.code
-			}
-			//请求登录接口
-			httpPost(loginUrl,data).then(resp=>{
-				//登录成功
-				console.log('mobileLogin', resp)
-				if(resp.code==200) {
-					that.userId=resp.data.userId;
-					that.$message.success('登录成功');
-					that.hiddenLoginPopNow();
-					that.isLogin=true;
-					that.userId=resp.data.userId;
-					that.initPage();
-				} else {
-					that.$message.error(resp.msg);
-				}
-			})
+			window.location.href = redirectUrl;
 		},
 
 		showStartLivingRoomTab: function() {
@@ -153,54 +130,6 @@ new Vue({
 			} else if(type==2) {
 				window.location.href = "./living_room_pk.html?roomId=" + roomId;
 			}
-		},
-
-		sendSmsCode: function () {
-			if (this.hasSendSms) {
-				return;
-			}
-			console.log(this.mobile);
-			var checkStatus = this.checkPhone();
-			if(!checkStatus) {
-				return;
-			}
-			//发送验证码按钮文字调整
-			var that = this;
-			let data = new FormData();
-			data.append("phone",this.mobile);
-			//请求短信发送接口
-			httpPost(sendSmsUrl,data).then(resp=>{
-				console.log('sendSmsCode', resp)
-				if(resp.code==200)	{
-					that.hasSendSms = true;
-					//短信发送成功会有一个弹窗
-					that.$message.success('短信发送成功');
-					var interval = setInterval(function () {
-						that.loginCodeBtn = '发送中(' + that.lastTime + ')';
-						if (that.lastTime == 0) {
-							that.lastTime = 60;
-							that.loginCodeBtn = '验证码';
-							that.hasSendSms = false;
-							console.log('清理定时器');
-							clearInterval(interval);
-							return;
-						} else {
-							that.lastTime = that.lastTime - 1;
-						}
-					}, 1000);
-				} else {
-					that.$message.error(resp.msg);
-				}
-			})
-		},
-
-		checkPhone: function(){
-			let phoneReg = /(^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$)/;
-			if (this.mobile == '' || !phoneReg.test(this.mobile)) {
-				this.$message.error('手机号格式有误');
-				return false;
-			}
-			return true;
 		},
 
 		initLoad: function() {
