@@ -24,10 +24,51 @@ function deleteCookie(name, path) {
     document.cookie = name + "=" + ";expires=" + expires.toUTCString() + path;
 }
 
+const GLOBAL_LOGOUT_COOKIE_KEY = "aiolos_sso_logout_at";
+const GLOBAL_LOGOUT_SEEN_KEY = "live_seen_logout_at";
+
+function resolveGlobalCookieDomain() {
+    var host = window.location.hostname || "";
+    if (host === "aiolos.com" || host.endsWith(".aiolos.com")) {
+        return ".aiolos.com";
+    }
+    return "";
+}
+
+function publishGlobalLogoutMarker() {
+    var now = Date.now();
+    var cookie = GLOBAL_LOGOUT_COOKIE_KEY + "=" + encodeURIComponent(String(now)) + "; path=/; SameSite=Lax";
+    var domain = resolveGlobalCookieDomain();
+    if (domain) {
+        cookie += "; domain=" + domain;
+    }
+    if (window.location.protocol === "https:") {
+        cookie += "; Secure";
+    }
+    document.cookie = cookie;
+    return now;
+}
+
+function readCookieValue(name) {
+    var cookies = document.cookie ? document.cookie.split("; ") : [];
+    for (var i = 0; i < cookies.length; i++) {
+        var item = cookies[i];
+        var idx = item.indexOf("=");
+        var key = idx > -1 ? item.substring(0, idx) : item;
+        if (key === name) {
+            return idx > -1 ? decodeURIComponent(item.substring(idx + 1)) : "";
+        }
+    }
+    return "";
+}
+
 function logout() {
+    publishGlobalLogoutMarker();
     httpPost(apiGatewayBase + userUrl + "/user/logout", {}).then(resp => {
         clearAuthTokens();
-        window.location.reload();
+        sessionStorage.removeItem(LIVE_OAUTH_SILENT_NEXT_AT_KEY);
+        var redirectPath = window.location.pathname + (window.location.search || "") + (window.location.hash || "");
+        window.location.href = liveOAuthClient.buildLogoutUrl(redirectPath);
     });
 }
 
@@ -37,6 +78,7 @@ const LIVE_OAUTH_STATE_KEY = "live_oauth_state";
 const LIVE_OAUTH_VERIFIER_KEY = "live_oauth_verifier";
 const LIVE_OAUTH_REDIRECT_KEY = "live_oauth_redirect";
 const LIVE_OAUTH_SILENT_NEXT_AT_KEY = "live_oauth_silent_next_at";
+const LIVE_OAUTH_TAB_INIT_KEY = "live_oauth_tab_initialized";
 
 const liveTokenStore = window.CommonAuthSdk.createTokenStore({
     accessTokenKey: LIVE_ACCESS_TOKEN_KEY,
@@ -82,10 +124,12 @@ const liveOAuthClient = window.CommonAuthSdk.createOAuthClient({
 });
 
 function getAccessToken() {
+    syncGlobalLogoutState();
     return liveTokenStore.getAccessToken();
 }
 
 function getRefreshToken() {
+    syncGlobalLogoutState();
     return liveTokenStore.getRefreshToken();
 }
 
@@ -98,6 +142,20 @@ function setAuthTokens(accessToken, refreshToken) {
 
 function clearAuthTokens() {
     liveTokenStore.clear();
+}
+
+function syncGlobalLogoutState() {
+    var marker = parseInt(readCookieValue(GLOBAL_LOGOUT_COOKIE_KEY) || "0", 10);
+    if (!marker) {
+        return;
+    }
+    var seen = parseInt(localStorage.getItem(GLOBAL_LOGOUT_SEEN_KEY) || "0", 10);
+    if (seen >= marker) {
+        return;
+    }
+    localStorage.setItem(GLOBAL_LOGOUT_SEEN_KEY, String(marker));
+    clearAuthTokens();
+    sessionStorage.removeItem(LIVE_OAUTH_SILENT_NEXT_AT_KEY);
 }
 
 function getNavigationType() {
@@ -119,12 +177,20 @@ function getNavigationType() {
 }
 
 function allowSilentSsoOnCurrentLoad() {
+    var query = window.location.search || "";
+    if (query.indexOf("silent_sso=1") > -1) {
+        return true;
+    }
+    var inited = sessionStorage.getItem(LIVE_OAUTH_TAB_INIT_KEY) === "1";
+    if (!inited) {
+        sessionStorage.setItem(LIVE_OAUTH_TAB_INIT_KEY, "1");
+        return false;
+    }
     var navType = getNavigationType();
     if (navType === "reload" || navType === "back_forward") {
         return true;
     }
-    var query = window.location.search || "";
-    return query.indexOf("silent_sso=1") > -1;
+    return false;
 }
 
 let isRefreshingToken = false;
