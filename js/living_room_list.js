@@ -18,7 +18,7 @@ new Vue({
 
 	//页面初始化的时候会调用下这里面的方法
 	mounted() {
-		this.initPage();
+		this.bootstrapPage();
 		this.listLivingRoom(1);
 		this.initLoad();
 		console.log('handler');
@@ -27,6 +27,20 @@ new Vue({
 	methods: {
 		load:function() {
 			console.log('this is load');
+		},
+		bootstrapPage: function() {
+			var that = this;
+			window.handleOAuthCallbackIfNeeded().then(function() {
+				if (!window.getAccessToken || !window.getAccessToken()) {
+					var started = window.trySilentSsoLogin && window.trySilentSsoLogin();
+					if (started) {
+						return;
+					}
+				}
+				that.initPage();
+			}).catch(function() {
+				that.initPage();
+			});
 		},
 		initPage:function() {
 			var that = this;
@@ -68,27 +82,10 @@ new Vue({
 			})
 		},
 		showLoginPopNow: function () {
-			this.goToLoginCenter();
+			window.startOAuthLogin();
 		},
 		logout: function() {
 			window.logout();
-		},
-		buildLoginCenterUrl: function () {
-			var currentUrl = window.location.href;
-			var target = loginCenterUrl || "";
-			if (!target) {
-				return "";
-			}
-			var joiner = target.indexOf("?") >= 0 ? "&" : "?";
-			return target + joiner + "redirect=" + encodeURIComponent(currentUrl);
-		},
-		goToLoginCenter: function () {
-			var redirectUrl = this.buildLoginCenterUrl();
-			if (!redirectUrl) {
-				this.$message.error("登录中心地址未配置");
-				return;
-			}
-			window.location.href = redirectUrl;
 		},
 
 		showStartLivingRoomTab: function() {
