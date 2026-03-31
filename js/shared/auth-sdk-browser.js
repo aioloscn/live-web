@@ -1,4 +1,5 @@
 (function (global) {
+    var AUTH_SDK_VERSION = '2026-03-31.1';
     function trimTrailingSlash(value) { return (value || '').replace(/\/+$/, ''); }
     function normalizePath(value, fallback) {
         var path = (value || '').trim();
@@ -194,5 +195,5 @@
             }
         };
     }
-    global.CommonAuthSdk = { createTokenStore: createTokenStore, buildOAuthConfig: buildOAuthConfig, createOAuthClient: createOAuthClient };
+    global.CommonAuthSdk = { AUTH_SDK_VERSION: AUTH_SDK_VERSION, createTokenStore: createTokenStore, buildOAuthConfig: buildOAuthConfig, createOAuthClient: createOAuthClient };
 })(window);
